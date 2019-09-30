@@ -1,0 +1,20 @@
+import numpy as np
+import pandas as pd
+from pandas import Series,DataFrame
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+%matplotlib inline
+
+#pip install xlrd
+#pip install openpyxl
+
+xlsfile1 = pd.ExcelFile('Myrmidon Production Data.xlsx')
+dframe1 = xlsfile1.parse('PROD')
+dframe1['<280'] = dframe1['Sand/Foot'] < 280
+dframe1['>280'] = dframe1['Sand/Foot'] > 280
+dframe1
+
+#Group wells based on Sand/Foot
+sns.lmplot('PROD_DAYS','CUM_TO_DATE', dframe1, hue='<280', fit_reg=False)
