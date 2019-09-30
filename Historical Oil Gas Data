@@ -1,0 +1,43 @@
+import numpy as np
+import pandas as pd
+from pandas import Series,DataFrame
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+%matplotlib inline
+
+import webbrowser
+website = 'https://www.rrc.state.tx.us/oil-gas/research-and-statistics/production-data/historical-production-data/crude-oil-production-and-well-counts-since-1935/'
+webbrowser.open(website)
+
+data = pd.read_clipboard()
+data
+
+A = data.Year
+B = np.array(data['Crude Oil Production (Mbbl)'])
+data['Crude Oil Production (Mbbl)'] = pd.to_numeric([i.replace(',','') for i in data['Crude Oil Production (Mbbl)']], errors = 'coerce')
+data['Number of Producing Wells'] = pd.to_numeric([i.replace(',','') for i in data['Number of Producing Wells']], errors = 'coerce')
+data['Percent Change in Production'] = pd.to_numeric([i.replace('%','') for i in data['Percent Change in Production']], errors = 'coerce')
+
+#Linear regression for oil production
+slope1,intercept1,r_value1,p_value1,std_err1 = stats.linregress(data['Year'],data['Crude Oil Production (Mbbl)'])
+crude_oil_recent10 = sns.regplot('Year','Crude Oil Production (Mbbl)',data.head(10), line_kws = {'linewidth':1,'label':"y={0:.1f}x+{1:.1f}".format(slope1,intercept1)})
+crude_oil_recent10.legend()
+plt.show()
+
+#Linear regression for # producing wells
+slope2,intercept2,r_value2,p_value2,std_err2 = stats.linregress(data['Year'],data['Number of Producing Wells'])
+prod_wells = sns.regplot('Year','Number of Producing Wells',data.head(10),line_kws = {'linewidth':1,'label':"y={0:.1f}x+{1:.1f}".format(slope2,intercept2)})
+prod_wells.legend()
+plt.show()
+
+#3rd order polynomial fit
+slope3,intercept3,r_value1,p_value1,std_err1 = stats.linregress(data['Year'],data['Crude Oil Production (Mbbl)'])
+crude_oil_recent50 = sns.regplot('Year','Crude Oil Production (Mbbl)',data.head(50), order=3, line_kws = {'linewidth':1,'label':"y={0:.1f}x+{1:.1f}".format(slope3,intercept3)})
+crude_oil_recent50.legend()
+plt.show()
+
+#Displays multiple plots to find relationships
+percent50 = sns.pairplot(data)
+
